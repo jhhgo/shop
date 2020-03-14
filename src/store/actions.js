@@ -1,12 +1,14 @@
 import {
   RECEIVE_ADDRESS,
   RECEIVE_SHOPS,
-  RECEIVE_CATEGORYS
+  RECEIVE_CATEGORYS,
+  RECEIVE_USERINFO
 } from "./mutations-type";
 import {
   reqAddress,
   reqFoodList,
-  reqShopList
+  reqShopList,
+  reqSession
 } from '../api/index'
 
 export default {
@@ -52,5 +54,21 @@ export default {
         shops
       })
     }
+  },
+  recordUser({
+    commit
+  }, userInfo) {
+    commit(RECEIVE_USERINFO, {
+      userInfo
+    })
+  },
+
+  async getSession({commit}) {
+    const result = await reqSession()
+    if (result.code === 1) {
+      return
+    }
+    const userInfo = result.data
+    commit(RECEIVE_USERINFO, {userInfo})
   }
 }

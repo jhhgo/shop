@@ -9,7 +9,7 @@
         </div>
       </div>
       <div class="login_content">
-        <form>
+        <form @submit.prevent="login">
           <div :class="{on: loginMethod}">
             <section class="login_message">
               <input type="tel" maxlength="11" placeholder="手机号" v-model="phone" />
@@ -21,7 +21,7 @@
               >{{time==0?'获取验证码':`已发送(${time}s)`}}</button>
             </section>
             <section class="login_verification">
-              <input type="tel" maxlength="8" placeholder="验证码" />
+              <input type="text" maxlength="8" placeholder="验证码" v-model="code" />
             </section>
             <section class="login_hint">
               温馨提示：未注册硅谷外卖帐号的手机号，登录时将自动注册，且代表已同意
@@ -31,7 +31,7 @@
           <div :class="{on: !loginMethod}">
             <section>
               <section class="login_message">
-                <input type="tel" maxlength="11" placeholder="手机/邮箱/用户名" />
+                <input type="name" v-model="name" maxlength="11" placeholder="手机/邮箱/用户名" />
               </section>
               <section class="login_verification">
                 <input
@@ -52,8 +52,14 @@
                 </div>
               </section>
               <section class="login_message">
-                <input type="text" maxlength="11" placeholder="验证码" />
-                <img class="get_verification" src="./images/captcha.svg" alt="captcha" />
+                <input type="text" maxlength="11" v-model="captcha" placeholder="验证码" />
+                <img
+                  @click="getCaptcha"
+                  class="get_verification"
+                  src="http://localhost:4000/captcha"
+                  alt="captcha"
+                  ref="captcha"
+                />
               </section>
             </section>
           </div>
@@ -65,11 +71,18 @@
         <i class="iconfont icon-jiantou2"></i>
       </a>
     </div>
+    <AlertTip :alertText="alertText" @closeTip="closeTip" v-show="isShowAlert" />
   </section>
 </template>
 
 <script>
+import AlertTip from "../../components/AlertTip/AlertTip";
+import { reqLogin, reqMsg, reqLoginByMsg } from "../../api";
+
 export default {
+  components: {
+    AlertTip
+  },
   data() {
     return {
       loginMethod: true, //true代表短信登陆
@@ -77,7 +90,12 @@ export default {
       phone: "",
       time: 0,
       isShowPwd: false,
-      pwd: ""
+      pwd: "",
+      name: "", //用户名
+      code: "", //短信验证码
+      captcha: "", //图形验证码
+      alertText: "xxx",
+      isShowAlert: false
     };
   },
   computed: {
@@ -86,15 +104,83 @@ export default {
     }
   },
   methods: {
-    sendCode(event) {
+    // 获取图形验证码
+    getCaptcha() {
+      this.$refs.captcha.src =
+        "http://localhost:4000/captcha?time=" + new Date();
+    },
+    // 关闭警告框
+    closeTip() {
+      this.isShowAlert = false;
+      this.alertText = "";
+    },
+    // 异步发送手机验证码
+    async sendCode(event) {
       this.time = 30;
-      const sid = setInterval(() => {
+      this.sid = setInterval(() => {
         this.time--;
         if (this.time <= 0) {
           this.time = 0;
           clearInterval(sid);
         }
       }, 1000);
+      const { phone } = this;
+      const result = await reqMsg({ phone });
+      if (result.code === 1) {
+        this.isShowAlert = true;
+        this.alertText = result.msg;
+        if (this.time) {
+          this.time = 0;
+          clearInterval(this.sid);
+        }
+      }
+    },
+    // 显示警告框
+    showAlert(alertText) {
+      this.isShowAlert = true;
+      this.alertText = alertText;
+    },
+    // 异步登录
+    async login() {
+      let result = {}
+      if (this.loginMethod) {
+        const { phone, code } = this;
+        if (!phone) {
+          this.showAlert("请输入手机号");
+          return;
+        }
+        if (!code) {
+          this.showAlert("请输入验证码");
+          return;
+        }
+        result = await reqLoginByMsg({ phone, code });
+      } else {
+        const { name, pwd, captcha } = this;
+        if (!name) {
+          this.showAlert("请输入用户名");
+          return;
+        }
+        if (!pwd) {
+          this.showAlert("请输入密码");
+          return;
+        }
+        if (!captcha) {
+          this.showAlert("请输入验证码");
+          return;
+        }
+        result = await reqLogin({ name, pwd, captcha });
+      }
+      if (this.time) {
+        this.time = 0;
+        clearInterval(this.sid);
+      }
+      if (result.code === 1) {
+        this.getCaptcha()
+        this.showAlert(result.msg)
+        return
+      }
+      this.$store.dispatch('recordUser', result.data)
+      this.$router.replace('/profile')
     }
   }
 };

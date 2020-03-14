@@ -50,6 +50,6 @@ export const reqLoginByMsg = ({
   code
 }, 'POST')
 // 9根据会话获取用户信息
-export const reqUser = () => ajax(BASE_PATH + '/userinfo')
+export const reqSession = () => ajax(BASE_PATH + '/userinfo')
 // 10用户登出
 export const reqLogout = () => ajax(BASE_PATH + '/logout')
