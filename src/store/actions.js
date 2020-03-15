@@ -2,13 +2,15 @@ import {
   RECEIVE_ADDRESS,
   RECEIVE_SHOPS,
   RECEIVE_CATEGORYS,
-  RECEIVE_USERINFO
+  RECEIVE_USERINFO,
+  CLEAR_USERINFO
 } from "./mutations-type";
 import {
   reqAddress,
   reqFoodList,
   reqShopList,
-  reqSession
+  reqSession,
+  reqLogout
 } from '../api/index'
 
 export default {
@@ -63,12 +65,26 @@ export default {
     })
   },
 
-  async getSession({commit}) {
+  async getSession({
+    commit
+  }) {
     const result = await reqSession()
     if (result.code === 1) {
       return
     }
     const userInfo = result.data
-    commit(RECEIVE_USERINFO, {userInfo})
+    commit(RECEIVE_USERINFO, {
+      userInfo
+    })
+  },
+
+  async logout({
+    commit
+  }) {
+    const result = await reqLogout()
+    if (result.code === 0) {
+      commit(CLEAR_USERINFO)
+    }
   }
+
 }
