@@ -4,5 +4,8 @@ export default {
   address: {},
   categorys: [],
   shops: [],
-  userInfo: {}
+  userInfo: {},
+  info: {},
+  goods: [],
+  ratings: []
 }

@@ -53,3 +53,11 @@ export const reqLoginByMsg = ({
 export const reqSession = () => ajax(BASE_PATH + '/userinfo')
 // 10用户登出
 export const reqLogout = () => ajax(BASE_PATH + '/logout')
+
+// 获取商家信息
+export const reqShopInfo = () => ajax('/info')
+
+//  获取商家评价
+export const reqShopRatings = () => ajax('/ratings')
+
+export const reqShopGoods = () => ajax('/goods')
