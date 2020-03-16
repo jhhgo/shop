@@ -1,7 +1,7 @@
 <template>
   <div class="shop-header">
     <nav class="shop-nav">
-      <a class="back">
+      <a class="back" @click="$router.back()">
         <i class="iconfont icon-arrow_left"></i>
       </a>
     </nav>

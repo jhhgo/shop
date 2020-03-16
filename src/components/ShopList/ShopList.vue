@@ -1,7 +1,12 @@
 <template>
-  <div class="shop_container">
+  <div class="shop_container" ref="shop">
     <ul class="shop_list" v-if="shops.length">
-      <li @click="$router.push('/shop')" class="shop_li border-1px" v-for="(shop, index) in shops" :key="index">
+      <li
+        @click="$router.push('/shop')"
+        class="shop_li border-1px"
+        v-for="(shop, index) in shops"
+        :key="index"
+      >
         <a>
           <div class="shop_left">
             <img class="shop_img" :src="baseImgUrl+shop.image_path" />
@@ -49,7 +54,7 @@
 <script>
 import { mapState } from "vuex";
 import Star from "../Star/Star";
-
+import BScroll from "better-scroll";
 export default {
   components: {
     Star

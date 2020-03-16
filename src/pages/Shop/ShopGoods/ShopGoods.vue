@@ -27,6 +27,7 @@
                 class="food-item bottom-border-1px"
                 v-for="(food, index) in good.foods"
                 :key="index"
+                @click="showFood(food)"
               >
                 <div class="icon">
                   <img width="57" height="57" :src="food.icon" />
@@ -42,7 +43,7 @@
                     <span class="now">￥{{food.price}}</span>
                     <span class="old" v-if="food.oldPrice">￥{{food.oldPrice}}</span>
                   </div>
-                  <CartControl :food="food"/>
+                  <CartControl :food="food" />
                 </div>
               </li>
             </ul>
@@ -50,21 +51,28 @@
         </ul>
       </div>
     </div>
+    <ShopCart/>
+    <Food :food="food" ref="foodInfo" />
   </div>
 </template>
 
 <script>
 import BScroll from "better-scroll";
 import { mapState } from "vuex";
+import Food from "../../../components/Food/Food";
 import CartControl from "../../../components/CartControl/CartControl";
+import ShopCart from "../../../components/ShopCart/ShopCart";
 export default {
   components: {
-    CartControl
+    CartControl,
+    Food,
+    ShopCart
   },
   data() {
     return {
       scrollY: 0,
-      tops: []
+      tops: [],
+      food: {}
     };
   },
   mounted() {
@@ -86,6 +94,10 @@ export default {
     }
   },
   methods: {
+    showFood(food) {
+      this.food = food;
+      this.$refs.foodInfo.toggleShow();
+    },
     clickMenu(index) {
       const scrollY = this.tops[index];
       this.scrollY = scrollY;

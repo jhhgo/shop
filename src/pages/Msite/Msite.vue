@@ -47,6 +47,7 @@ import "swiper/css/swiper.min.css";
 import HeaderTop from "../../components/HeaderTop/HeaderTop.vue";
 import ShopList from "../../components/ShopList/ShopList.vue";
 import { mapState } from "vuex";
+import BScroll from "better-scroll";
 
 export default {
   data() {
@@ -67,12 +68,21 @@ export default {
             el: ".swiper-pagination"
           }
         });
+
+        new BScroll(".msite_shop_list", {
+          click: true
+        });
       });
     }
   },
   mounted() {
     this.$store.dispatch("getFood");
     this.$store.dispatch("getShops");
+    this.$nextTick(() => {
+      new BScroll(".msite", {
+        click: true
+      });
+    });
   },
   computed: {
     ...mapState(["userInfo"]),
